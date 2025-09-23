@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <title>{{ title }}</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Custom CSS -->
+  <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+</head>
+<body class="bg-light">
+    <!-- Tampilkan flash messages -->
+  <div class="container mt-3">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }} alert-dismissible fade show">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+  </div>
+  <div class="container py-4">
+    <h2 class="mb-4 text-center">🏢 {{ title }}</h2>
+
+    <div class="text-center mb-3">
+      <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">📊 Lihat Dashboard</a>
+    </div>
+
+    <!-- 🔎 Form Filter -->
+    <form method="get" class="row g-2 mb-3">
+      <div class="col-md-4">
+        <input type="text" name="search" class="form-control" placeholder="Cari Nama atau NOPEG" value="{{ search }}">
+      </div>
+      <div class="col-md-3">
+        <select name="bagian" class="form-select">
+          <option value="all" {% if bagian_selected == "all" %}selected{% endif %}>-- Cari Bagian / Divisi --</option>
+          {% for b in bagian_list %}
+            <option value="{{ b }}" {% if b == bagian_selected %}selected{% endif %}>{{ b }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-3">
+        <select name="status" class="form-select">
+          <option value="all" {% if status_selected == "all" %}selected{% endif %}>-- Cari Status Cicilan --</option>
+          <option value="Lunas" {% if status_selected == "Lunas" %}selected{% endif %}>Lunas</option>
+          <option value="Berjalan" {% if status_selected == "Berjalan" %}selected{% endif %}>Berjalan</option>
+          <option value="Belum Bayar" {% if status_selected == "Belum Bayar" %}selected{% endif %}>Belum Bayar</option>
+        </select>
+      </div>
+      <div class="col-md-1 d-flex align-items-stretch">
+        <button type="submit" class="btn btn-secondary w-100">Filter</button>
+      </div>
+      <div class="col-md-1 d-flex align-items-stretch">
+        <a href="/" class="btn btn-secondary w-100">Reset</a>
+      </div>
+    </form>
+
+    <!-- 📊 Tabel Data -->
+    <div class="card shadow-sm">
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-striped table-hover mb-0">
+            <thead>
+              <tr>
+                <th>NOPEG</th>
+                <th>Nama</th>
+                <th>Bagian</th>
+                <th>Jumlah</th>
+                <th>Lama</th>
+                <th>Cicilan/bulan</th>
+                <th>Angsuran Ke</th>
+                <th>Angsuran Sisa</th>
+                <th>Sisa Cicilan (Rp)</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% if data %}
+                {% for row in data %}
+                  <tr>
+                    <td class="nopeg-col">{{ row.NOPEG }}</td>
+                    <td class="nama-col">{{ row.NAMA }}</td>
+                    <td class="bagian-col">{{ row.BAGIAN }}</td>
+                    <td class="center-col">{{ "{:,.0f}".format(row.JML|float) }}</td>
+                    <td class="center-col">{{ row.LAMA }}</td>
+                    <td class="center-col">{{ "{:,.0f}".format(row.CICIL|float) }}</td>
+                    <td class="center-col">{{ row.ANGSURAN_KE }}</td>
+                    <td class="center-col">{{ row.SISA_ANGSURAN }}</td>
+                    <td class="center-col">{{ "{:,.0f}".format(row.SISA_CICILAN|float) }}</td>
+                    <td>
+                      {% if row.STATUS == "Lunas" %}
+                        <span class="badge bg-success">{{ row.STATUS }}</span>
+                      {% elif row.STATUS == "Berjalan" %}
+                        <span class="badge bg-primary">{{ row.STATUS }}</span>
+                      {% else %}
+                        <span class="badge bg-warning text-dark">{{ row.STATUS }}</span>
+                      {% endif %}
+                    </td>
+                  </tr>
+                {% endfor %}
+              {% else %}
+                <tr><td colspan="10" class="text-center py-3">Tidak ada data</td></tr>
+              {% endif %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- 🔽 Baris bawah (Pagination + Export/Import) -->
+    <div class="d-flex justify-content-between align-items-center mt-3">
+      <div>
+        {% if total_pages > 1 %}
+          <nav>
+            <ul class="pagination mb-0">
+              <li class="page-item {% if page == 1 %}disabled{% endif %}">
+                <a class="page-link" href="?search={{ search }}&bagian={{ bagian_selected }}&status={{ status_selected }}&page={{ page - 1 }}">« Prev</a>
+              </li>
+              {% for p in range(1, total_pages + 1) %}
+                <li class="page-item {% if page == p %}active{% endif %}">
+                  <a class="page-link" href="?search={{ search }}&bagian={{ bagian_selected }}&status={{ status_selected }}&page={{ p }}">{{ p }}</a>
+                </li>
+              {% endfor %}
+              <li class="page-item {% if page == total_pages %}disabled{% endif %}">
+                <a class="page-link" href="?search={{ search }}&bagian={{ bagian_selected }}&status={{ status_selected }}&page={{ page + 1 }}">Next »</a>
+              </li>
+            </ul>
+          </nav>
+        {% endif %}
+      </div>
+
+      <div class="d-flex gap-2">
+        <div class="btn-group">
+          <button type="button" class="btn btn-success dropdown-toggle" data-bs-toggle="dropdown">
+            Export
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li><a class="dropdown-item" href="/export/excel">Export Excel</a></li>
+            <li><a class="dropdown-item" href="/export/csv">Export CSV</a></li>
+            <li><a class="dropdown-item" href="/export/pdf">Export PDF</a></li>
+          </ul>
+        </div>
+        <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#importModal">
+          Import
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Import -->
+  <div class="modal fade" id="importModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <form action="/import" method="post" enctype="multipart/form-data">
+          <div class="modal-header">
+            <h5 class="modal-title">Import File</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <input type="file" name="file" class="form-control" required>
+            <small class="text-muted">Hanya mendukung file .DBF</small>
+          </div>
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-primary">Upload</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

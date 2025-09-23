@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <title>{{ title }}</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-light">
+  <div class="container py-4">
+    <h2 class="mb-4 text-center fw-bold text-dark">📊 {{ title }}</h2>
+
+    <!-- Ringkasan Angka Besar -->
+    <div class="row text-center mb-4 g-4">
+      <div class="col-md-4">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Total Cicilan</h5>
+            <h2 class="fw-bold text-primary">Rp {{ "{:,.0f}".format(total_cicilan) }}</h2>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Rata-rata Cicilan</h5>
+            <h2 class="fw-bold text-success">Rp {{ "{:,.0f}".format(avg_cicilan) }}</h2>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Jumlah Karyawan</h5>
+            <h2 class="fw-bold text-dark">{{ total_karyawan }}</h2>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Grafik -->
+    <div class="row g-4 mt-2">
+      <div class="col-md-6">
+        <div class="card h-100">
+          <div class="card-header bg-primary text-white text-center">
+            Grafik Status Cicilan
+          </div>
+          <div class="card-body chart-container">
+            <canvas id="statusChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="card h-100">
+          <div class="card-header bg-success text-white text-center">
+            Grafik Bagian/Divisi
+          </div>
+          <div class="card-body chart-container">
+            <canvas id="bagianChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="text-center mt-4">
+      <a href="{{ url_for('index') }}" class="btn btn-outline-secondary btn-lg px-4">⬅ Kembali ke Data</a>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    // ✅ Data untuk chart status (dibungkus JSON.parse biar VS Code ga error)
+    const statusLabels = JSON.parse(`{{ status_count.keys()|list|tojson|safe if status_count else '[]' }}`);
+    const statusData   = JSON.parse(`{{ status_count.values()|list|tojson|safe if status_count else '[]' }}`);
+
+    new Chart(document.getElementById('statusChart'), {
+      type: 'doughnut',
+      data: {
+        labels: statusLabels,
+        datasets: [{
+          data: statusData,
+          backgroundColor: ['#198754', '#0d6efd', '#ffc107']
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { position: 'bottom' }
+        },
+        animation: { animateScale: true, animateRotate: true }
+      }
+    });
+
+    // ✅ Data untuk chart bagian/divisi (dibungkus JSON.parse juga)
+    const bagianLabels = JSON.parse(`{{ bagian_count.keys()|list|tojson|safe if bagian_count else '[]' }}`);
+    const bagianData   = JSON.parse(`{{ bagian_count.values()|list|tojson|safe if bagian_count else '[]' }}`);
+
+    new Chart(document.getElementById('bagianChart'), {
+      type: 'bar',
+      data: {
+        labels: bagianLabels,
+        datasets: [{
+          label: 'Jumlah Karyawan',
+          data: bagianData,
+          backgroundColor: '#20c997'
+        }]
+      },
+      options: {
+        indexAxis: 'y',
+        responsive: true,
+        maintainAspectRatio: false,
+        layout: {
+          padding: { bottom: 20 } // ✅ Biar label ga ketekan
+        },
+        plugins: { legend: { display: false } },
+        animation: { duration: 1200, easing: 'easeOutQuart' },
+        scales: {
+          y: {
+            ticks: {
+              autoSkip: false // ✅ Biar semua label bagian tampil
+            }
+          }
+        }
+      }
+    });
+  </script>
+</body>
+</html>

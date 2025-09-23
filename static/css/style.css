@@ -1,0 +1,167 @@
+/* Background & container */ 
+body {
+  background-color: #f8f9fa;
+  font-family: "Segoe UI", Roboto, Arial, sans-serif;
+}
+
+.container {
+  margin-top: 10px;
+}
+
+.card {
+  border-radius: 12px;
+  border: none;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+}
+
+.card-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #6c757d;
+}
+
+.card-body h2 {
+  font-size: 1.8rem;
+}
+
+/* Semua header (judul kolom) rata tengah */
+table th {
+  text-align: center;
+  vertical-align: middle;
+  background-color: #343a40;
+  color: #ffffff;
+  font-weight: 600;
+}
+
+/* Semua isi tabel default rata tengah */
+table td {
+  text-align: center;
+  vertical-align: middle;
+}
+
+/* Kolom NOPEG rata kiri */
+td.nopeg-col {
+  text-align: left !important;
+  padding-left: 1rem;
+  font-weight: 500;
+}
+
+/* Kolom Nama: rata kiri + ellipsis */
+td.nama-col {
+  text-align: left !important;
+  padding-left: 0.8rem;
+  max-width: 200px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Kolom Bagian rata kiri */
+td.bagian-col {
+  text-align: left !important;
+  padding-left: 1.1rem;
+}
+
+/* Kolom center (Jumlah, Lama, Cicilan, Angsuran, Sisa) */
+td.center-col {
+  text-align: center !important;
+}
+
+/* Badge status */
+.badge-status {
+  font-weight: 600;
+  padding: .45em .7em;
+  font-size: .85em;
+  border-radius: 8px;
+}
+
+/* Tambahan: Warna row striping */
+.table-striped tbody tr:nth-of-type(odd) {
+  background-color: #fdfdfd;
+}
+.table-striped tbody tr:nth-of-type(even) {
+  background-color: #f3f6fa;
+}
+
+/* Hover effect */
+.table-hover tbody tr:hover {
+  background-color: #e9f5ff;
+  transition: background-color 0.2s ease-in-out;
+}
+
+/* Responsiveness */
+.table-responsive {
+  overflow-x: auto;
+}
+
+/* Samakan tinggi input, select, dan tombol */
+.form-control,
+.form-select,
+.btn {
+  height: 100%;
+}
+
+/* Tabel ringkasan (dashboard) */
+.table-summary th {
+  text-align: center;
+  background-color: #495057;
+  color: #fff;
+}
+
+.table-summary td {
+  vertical-align: middle;
+}
+
+/* Chart card header */
+.card-header {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+/* === Dashboard Custom Style === */
+body {
+  background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+}
+
+h2 {
+  letter-spacing: 1px;
+}
+
+.card {
+  border: none;
+  border-radius: 1rem;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+}
+
+.card-header {
+  border-top-left-radius: 1rem !important;
+  border-top-right-radius: 1rem !important;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.btn-lg {
+  border-radius: 50px;
+  transition: all 0.3s ease;
+}
+.btn-lg:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+/* Chart container fix biar ukurannya konsisten */
+.chart-container {
+  position: relative;
+  height: 700px;  /* ✅ Samain tinggi semua chart */
+}
