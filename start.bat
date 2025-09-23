@@ -1,3 +1,3 @@
 @echo off
-python app.py
-pause
+call venv\Scripts\activate
+cmd /k "python app.py"
