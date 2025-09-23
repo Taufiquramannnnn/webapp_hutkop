@@ -24,6 +24,9 @@ from reportlab.lib.pagesizes import A4, landscape
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib.units import cm
 
+import webbrowser
+import threading
+
 # =============================
 # Config
 # =============================
@@ -445,4 +448,9 @@ def dashboard():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    # ✅ Auto buka browser default ke http://127.0.0.1:5000/
+    def open_browser():
+        webbrowser.open("http://127.0.0.1:5000/")
+    threading.Timer(1.0, open_browser).start()
+
+    app.run(debug=False)
