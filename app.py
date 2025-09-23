@@ -446,7 +446,6 @@ def dashboard():
         return redirect(url_for("index"))
 
 
-
 if __name__ == "__main__":
     # ✅ Auto buka browser default ke http://127.0.0.1:5000/
     def open_browser():
