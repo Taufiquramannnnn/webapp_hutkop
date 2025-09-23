@@ -33,20 +33,20 @@ Juga tersedia halaman **dashboard interaktif** dengan grafik status cicilan & di
    cd pinjaman-karyawan
 
 2. **Buat virtual environment (opsional tapi direkomendasikan)**
-   '''bash
+   ```bash
    python -m venv venv
    source venv/bin/activate   # macOS/Linux
    venv\Scripts\activate      # Windows
 
 3. **Install dependencies**
-   '''bash
+   ```bash
    pip install -r requirements.txt
 
 4. **Jalankan aplikasi**
-   '''bash
+   ```bash
    python app.py
 
 5. **Akses di browser**
-   '''bash
+   ```bash
    http://127.0.0.1:5000
 
