@@ -276,7 +276,19 @@ def import_file():
 @app.route("/export/csv")
 def export_csv():
     try:
-        df = pd.DataFrame(load_data())
+        data = load_data()
+        # Pilih hanya kolom hasil
+        df = pd.DataFrame(data)[[
+            "NOPEG", "NAMA", "BAGIAN", "JML", "LAMA", "CICIL",
+            "ANGSURAN_KE", "SISA_ANGSURAN", "SISA_CICILAN", "STATUS"
+        ]]
+        # Rename biar sama persis kaya PDF
+        df = df.rename(columns={
+            "JML": "JUMLAH",
+            "CICIL": "CICILAN",
+            "SISA_ANGSURAN": "SISA",
+            "SISA_CICILAN": "SISA CICILAN"
+        })
         filename = os.path.join(UPLOAD_FOLDER, "export.csv")
         df.to_csv(filename, index=False, encoding="utf-8-sig")
         return send_file(filename, as_attachment=True, download_name="export_data.csv")
@@ -288,7 +300,19 @@ def export_csv():
 @app.route("/export/excel")
 def export_excel():
     try:
-        df = pd.DataFrame(load_data())
+        data = load_data()
+        # Pilih hanya kolom hasil
+        df = pd.DataFrame(data)[[
+            "NOPEG", "NAMA", "BAGIAN", "JML", "LAMA", "CICIL",
+            "ANGSURAN_KE", "SISA_ANGSURAN", "SISA_CICILAN", "STATUS"
+        ]]
+        # Rename biar sama persis kaya PDF
+        df = df.rename(columns={
+            "JML": "JUMLAH",
+            "CICIL": "CICILAN",
+            "SISA_ANGSURAN": "SISA",
+            "SISA_CICILAN": "SISA CICILAN"
+        })
         filename = os.path.join(UPLOAD_FOLDER, "export.xlsx")
         df.to_excel(filename, index=False)
         return send_file(filename, as_attachment=True, download_name="export_data.xlsx")
