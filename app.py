@@ -183,7 +183,7 @@ def index():
             for r in all_data if (r.get("BAGIAN") or "").strip()
         })
 
-        # ✅ Tambahan: hitung data untuk grafik
+        # Tambahan: hitung data untuk grafik
         status_count = {
             "Lunas": sum(1 for r in filtered if r["STATUS"] == "Lunas"),
             "Berjalan": sum(1 for r in filtered if r["STATUS"] == "Berjalan"),
@@ -327,7 +327,6 @@ def export_pdf():
         data = load_data()
         filename = "export_data.pdf"
 
-        # 🔥 pake landscape + margin biar tabel muat di kertas
         doc = SimpleDocTemplate(
             filename,
             pagesize=landscape(A4),
