@@ -1,4 +1,4 @@
-# 📊 Aplikasi Pinjaman Karyawan
+# 📊 Aplikasi Pengelola Data Pinjaman Karyawan
 
 Aplikasi berbasis **Flask (Python)** untuk mengelola data pinjaman karyawan koperasi.  
 Mendukung import file **DBF/Excel**, perhitungan cicilan otomatis, filter & pencarian, serta export ke **PDF, CSV, dan Excel**.  
