@@ -1,6 +1,10 @@
-Flask
-pandas
-dbfread
-reportlab
-openpyxl
-pyinstaller
+# File ini berisi daftar library Python yang dibutuhkan oleh aplikasi.
+# Direkomendasikan untuk menginstall menggunakan virtual environment.
+# Perintah: pip install -r requirements.txt
+
+Flask==3.0.3
+pandas==2.2.2
+dbfread==2.1.0
+reportlab==4.2.0
+openpyxl==3.1.2
+pyinstaller==6.9.0

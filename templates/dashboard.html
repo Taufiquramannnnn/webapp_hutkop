@@ -1,222 +1,226 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="utf-8">
-  <title>{{ title }}</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ title }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            background-color: #f0f2f5;
+        }
+        .navbar-brand {
+            font-weight: bold;
+        }
+        .kpi-card h3 { /* Diubah dari h2 ke h3 */
+            font-size: 2rem;
+        }
+        .card {
+            border: none;
+            border-radius: 0.75rem;
+        }
+        .chart-container {
+            position: relative;
+            height: 350px;
+            width: 100%;
+        }
+    </style>
 </head>
-<body class="bg-light">
-  <div class="container py-4">
-    <h2 class="mb-4 text-center fw-bold text-dark">📊 {{ title }}</h2>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="bi bi-wallet2"></i>
+                Hutang Koperasi Dashboard
+            </a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="{{ url_for('index') }}">
+                    <i class="bi bi-table"></i> Kembali ke Tabel Data
+                </a>
+            </div>
+        </div>
+    </nav>
+    <div class="container py-4">
+        <h2 class="mb-4 text-center fw-bold text-dark">📊 {{ title }}</h2>
 
-    <!-- Ringkasan Angka Besar -->
-    <div class="row text-center mb-4 g-4">
-      <div class="col-md-4">
-        <div class="card">
-          <div class="card-body">
-            <h5 class="card-title">Total Cicilan</h5>
-            <h2 class="fw-bold text-primary">Rp {{ "{:,.0f}".format(total_cicilan) }}</h2>
-          </div>
+        <div class="row text-center mb-4 g-4">
+            <div class="col-lg-4 col-md-6">
+                <div class="card kpi-card shadow-sm h-100">
+                    <div class="card-body d-flex align-items-center p-4">
+                        <i class="bi bi-cash-coin fs-1 text-primary me-4"></i>
+                        <div>
+                            <h6 class="card-title text-muted mb-1 text-start">Total Pinjaman Aktif</h6>
+                            <h3 class="fw-bold text-primary mb-0 text-start d-flex align-items-baseline">
+                                <span style="font-size: 0.6em; margin-right: 0.3rem;">Rp</span>
+                                <span>{{ "{:,.0f}".format(total_pinjaman) }}</span>
+                            </h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <div class="card kpi-card shadow-sm h-100">
+                    <div class="card-body d-flex align-items-center p-4">
+                        <i class="bi bi-exclamation-triangle-fill fs-1 text-danger me-4"></i>
+                        <div>
+                            <h6 class="card-title text-muted mb-1 text-start">Sisa Pinjaman Beredar</h6>
+                            <h3 class="fw-bold text-danger mb-0 text-start d-flex align-items-baseline">
+                                <span style="font-size: 0.6em; margin-right: 0.3rem;">Rp</span>
+                                <span>{{ "{:,.0f}".format(sisa_pinjaman) }}</span>
+                            </h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-12">
+                <div class="card kpi-card shadow-sm h-100">
+                    <div class="card-body d-flex align-items-center p-4">
+                        <i class="bi bi-people-fill fs-1 text-dark me-4"></i>
+                        <div>
+                            <h6 class="card-title text-muted mb-1 text-start">Total Peminjam Aktif</h6>
+                            <h3 class="fw-bold text-dark mb-0 text-start">{{ total_karyawan }}</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
-      <div class="col-md-4">
-        <div class="card">
-          <div class="card-body">
-            <h5 class="card-title">Rata-rata Cicilan</h5>
-            <h2 class="fw-bold text-success">Rp {{ "{:,.0f}".format(avg_cicilan) }}</h2>
-          </div>
+
+        <div class="row g-4 mt-2">
+            <div class="col-lg-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-header text-center bg-white border-0 pt-3">
+                        <h5 class="fw-bold">Status Pinjaman</h5>
+                    </div>
+                    <div class="card-body chart-container">
+                        <canvas id="statusChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-8">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-header text-center bg-white border-0 pt-3">
+                        <h5 class="fw-bold">Top 10 Peminjam Terbesar</h5>
+                    </div>
+                    <div class="card-body chart-container">
+                        <canvas id="topBorrowersChart"></canvas>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
-      <div class="col-md-4">
-        <div class="card">
-          <div class="card-body">
-            <h5 class="card-title">Jumlah Karyawan</h5>
-            <h2 class="fw-bold text-dark">{{ total_karyawan }}</h2>
-          </div>
+
+        <div class="row g-4 mt-4">
+            <div class="col-lg-6">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-header text-center bg-white border-0 pt-3">
+                        <h5 class="fw-bold">Top 10 Divisi (Jumlah Peminjam)</h5>
+                    </div>
+                    <div class="card-body chart-container">
+                        <canvas id="bagianChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-header text-center bg-white border-0 pt-3">
+                        <h5 class="fw-bold">Top 10 Divisi (Total Pinjaman)</h5>
+                    </div>
+                    <div class="card-body chart-container">
+                        <canvas id="bagianPinjamanChart"></canvas>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
+
     </div>
 
-    <!-- Grafik Row 1 -->
-    <div class="row g-4 mt-2">
-      <div class="col-md-6">
-        <div class="card h-100">
-          <div class="card-header bg-primary text-white text-center">
-            Grafik Status Cicilan
-          </div>
-          <div class="card-body chart-container-small">
-            <canvas id="statusChart"></canvas>
-          </div>
-        </div>
-      </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
-      <div class="col-md-6">
-        <div class="card h-100">
-          <div class="card-header bg-success text-white text-center">
-            Grafik Bagian/Divisi
-          </div>
-          <div class="card-body chart-container-small">
-            <canvas id="bagianChart"></canvas>
-          </div>
-        </div>
-      </div>
-    </div>
+    <script>
+        // Data untuk chart status
+        const statusLabels = JSON.parse(`{{ status_count.keys()|list|tojson|safe }}`);
+        const statusData = JSON.parse(`{{ status_count.values()|list|tojson|safe }}`);
+        new Chart(document.getElementById('statusChart'), {
+            type: 'doughnut',
+            data: {
+                labels: statusLabels,
+                datasets: [{
+                    data: statusData,
+                    backgroundColor: ['#28a745', '#007bff', '#ffc107'],
+                    borderColor: '#fff',
+                    borderWidth: 2
+                }]
+            },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+        });
 
-    <!-- Grafik Row 2 -->
-    <div class="row g-4 mt-2">
-      <div class="col-md-6">
-        <div class="card h-100">
-          <div class="card-header bg-warning text-white text-center">
-            Top 10 Karyawan (Cicilan Terbesar)
-          </div>
-          <div class="card-body chart-container-large">
-            <canvas id="topBorrowersChart"></canvas>
-          </div>
-        </div>
-      </div>
-
-      <div class="col-md-6">
-        <div class="card h-100">
-          <div class="card-header bg-danger text-white text-center">
-            Total Cicilan per Divisi
-          </div>
-          <div class="card-body chart-container-large">
-            <canvas id="bagianCicilanChart"></canvas>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="text-center mt-4">
-      <a href="{{ url_for('index') }}" class="btn btn-outline-secondary btn-lg px-4">⬅ Kembali ke Data</a>
-    </div>
-  </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
-  <script>
-    // ✅ Data untuk chart status
-    const statusLabels = JSON.parse(`{{ status_count.keys()|list|tojson|safe if status_count else '[]' }}`);
-    const statusData   = JSON.parse(`{{ status_count.values()|list|tojson|safe if status_count else '[]' }}`);
-
-    new Chart(document.getElementById('statusChart'), {
-      type: 'doughnut',
-      data: {
-        labels: statusLabels,
-        datasets: [{
-          data: statusData,
-          backgroundColor: ['#198754', '#0d6efd', '#ffc107']
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: { position: 'bottom' }
-        },
-        animation: { animateScale: true, animateRotate: true }
-      }
-    });
-
-    // ✅ Data untuk chart bagian/divisi
-    const bagianLabels = JSON.parse(`{{ bagian_count.keys()|list|tojson|safe if bagian_count else '[]' }}`);
-    const bagianData   = JSON.parse(`{{ bagian_count.values()|list|tojson|safe if bagian_count else '[]' }}`);
-
-    new Chart(document.getElementById('bagianChart'), {
-      type: 'bar',
-      data: {
-        labels: bagianLabels,
-        datasets: [{
-          label: 'Jumlah Karyawan',
-          data: bagianData,
-          backgroundColor: '#20c997'
-        }]
-      },
-      options: {
-        indexAxis: 'y',
-        responsive: true,
-        maintainAspectRatio: false,
-        layout: { padding: { bottom: 20 } },
-        plugins: { legend: { display: false } },
-        animation: { duration: 1200, easing: 'easeOutQuart' },
-        scales: {
-          y: {
-            ticks: { autoSkip: false }
-          }
-        }
-      }
-    });
-
-    // ✅ Data untuk Top 10 Borrowers (nama di bawah, Rp di kiri)
-    const borrowerLabels = JSON.parse(`{{ top_borrowers|map(attribute='nama')|list|tojson|safe if top_borrowers else '[]' }}`);
-    const borrowerData   = JSON.parse(`{{ top_borrowers|map(attribute='cicil')|list|tojson|safe if top_borrowers else '[]' }}`);
-
-    new Chart(document.getElementById('topBorrowersChart'), {
-      type: 'bar',
-      data: {
-        labels: borrowerLabels,
-        datasets: [{
-          label: 'Cicilan (Rp)',
-          data: borrowerData,
-          backgroundColor: '#fd7e14'
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: { legend: { display: false } },
-        animation: { duration: 1200, easing: 'easeOutQuart' },
-        scales: {
-          y: {
-            ticks: {
-              callback: value => 'Rp ' + value.toLocaleString()
+        // Data untuk chart bagian/divisi (jumlah karyawan)
+        const bagianLabels = JSON.parse(`{{ bagian_count.keys()|list|tojson|safe }}`);
+        const bagianData = JSON.parse(`{{ bagian_count.values()|list|tojson|safe }}`);
+        new Chart(document.getElementById('bagianChart'), {
+            type: 'bar',
+            data: {
+                labels: bagianLabels,
+                datasets: [{
+                    label: 'Jumlah Karyawan',
+                    data: bagianData,
+                    backgroundColor: '#17a2b8'
+                }]
+            },
+            options: {
+                indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: { y: { ticks: { autoSkip: false, font: { size: 10 } } } }
             }
-          },
-          x: {
-            ticks: {
-              autoSkip: false
+        });
+        
+        // Data untuk Top 10 Peminjam
+        const borrowerLabels = JSON.parse(`{{ top_borrowers|map(attribute='nama')|list|tojson|safe }}`);
+        const borrowerData = JSON.parse(`{{ top_borrowers|map(attribute='jumlah')|list|tojson|safe }}`);
+        new Chart(document.getElementById('topBorrowersChart'), {
+            type: 'bar',
+            data: {
+                labels: borrowerLabels,
+                datasets: [{
+                    label: 'Total Pinjaman (Rp)',
+                    data: borrowerData,
+                    backgroundColor: '#fd7e14'
+                }]
+            },
+            options: {
+                indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { ticks: { callback: value => 'Rp ' + (value/1000000).toFixed(1) + ' Jt' } },
+                    y: { ticks: { autoSkip: false } }
+                }
             }
-          }
-        }
-      }
-    });
+        });
 
-    // ✅ Data untuk Total Cicilan per Divisi
-    const bagianCicilanLabels = JSON.parse(`{{ bagian_cicilan.keys()|list|tojson|safe if bagian_cicilan else '[]' }}`);
-    const bagianCicilanData   = JSON.parse(`{{ bagian_cicilan.values()|list|tojson|safe if bagian_cicilan else '[]' }}`);
-
-    new Chart(document.getElementById('bagianCicilanChart'), {
-      type: 'bar',
-      data: {
-        labels: bagianCicilanLabels,
-        datasets: [{
-          label: 'Total Cicilan (Rp)',
-          data: bagianCicilanData,
-          backgroundColor: '#dc3545'
-        }]
-      },
-      options: {
-        indexAxis: 'y',
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: { legend: { display: false } },
-        animation: { duration: 1200, easing: 'easeOutQuart' },
-        scales: {
-          x: {
-            ticks: {
-              callback: value => 'Rp ' + value.toLocaleString()
+        // Data untuk Total Pinjaman per Divisi
+        const bagianPinjamanLabels = JSON.parse(`{{ bagian_pinjaman.keys()|list|tojson|safe }}`);
+        const bagianPinjamanData = JSON.parse(`{{ bagian_pinjaman.values()|list|tojson|safe }}`);
+        new Chart(document.getElementById('bagianPinjamanChart'), {
+            type: 'bar',
+            data: {
+                labels: bagianPinjamanLabels,
+                datasets: [{
+                    label: 'Total Pinjaman (Rp)',
+                    data: bagianPinjamanData,
+                    backgroundColor: '#dc3545'
+                }]
+            },
+            options: {
+                indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { ticks: { callback: value => 'Rp ' + (value/1000000).toFixed(1) + ' Jt' } },
+                    y: { ticks: { autoSkip: false, font: { size: 10 } } }
+                }
             }
-          },
-          y: {
-            ticks: {
-              autoSkip: false
-            }
-          }
-        }
-      }
-    });
-  </script>
+        });
+    </script>
 </body>
 </html>
