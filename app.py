@@ -410,7 +410,9 @@ def dashboard():
                 bagian_count={},
                 total_cicilan=0,
                 avg_cicilan=0,
-                total_karyawan=0
+                total_karyawan=0,
+                top_borrowers=[],
+                bagian_cicilan={}
             )
 
         # Ringkasan status
@@ -420,7 +422,7 @@ def dashboard():
             "Belum Bayar": sum(1 for r in all_data if r["STATUS"] == "Belum Bayar"),
         }
 
-        # Ringkasan bagian/divisi
+        # Ringkasan bagian/divisi (jumlah karyawan)
         bagian_count = {}
         for r in all_data:
             bagian = r.get("BAGIAN") or "Tidak Ada"
@@ -431,6 +433,19 @@ def dashboard():
         avg_cicilan = round(total_cicilan / len(all_data), 2) if all_data else 0
         total_karyawan = len(all_data)
 
+        # ✅ Top 10 karyawan dengan cicilan terbesar
+        sorted_by_cicil = sorted(all_data, key=lambda x: x.get("CICIL", 0), reverse=True)
+        top_borrowers = [
+            {"nama": r["NAMA"], "cicil": r["CICIL"]}
+            for r in sorted_by_cicil[:10]
+        ]
+
+        # ✅ Total nominal cicilan per divisi
+        bagian_cicilan = {}
+        for r in all_data:
+            bagian = r.get("BAGIAN") or "Tidak Ada"
+            bagian_cicilan[bagian] = bagian_cicilan.get(bagian, 0) + (r.get("CICIL") or 0)
+
         return render_template(
             "dashboard.html",
             title="Dashboard Ringkasan",
@@ -438,7 +453,9 @@ def dashboard():
             bagian_count=bagian_count,
             total_cicilan=total_cicilan,
             avg_cicilan=avg_cicilan,
-            total_karyawan=total_karyawan
+            total_karyawan=total_karyawan,
+            top_borrowers=top_borrowers,
+            bagian_cicilan=bagian_cicilan
         )
     except Exception as e:
         logger.error(f"Error in dashboard route: {str(e)}")

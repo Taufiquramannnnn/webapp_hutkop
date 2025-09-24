@@ -160,8 +160,15 @@ h2 {
   box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
 
-/* Chart container fix biar ukurannya konsisten */
-.chart-container {
+/* === Fix ukuran chart sesuai row === */
+.chart-container-small {
   position: relative;
-  height: 700px;  /* ✅ Samain tinggi semua chart */
+  width: 100%;
+  height: 700px;   /* row atas */
+}
+
+.chart-container-large {
+  position: relative;
+  width: 100%;
+  height: 700px;   /* row bawah */
 }

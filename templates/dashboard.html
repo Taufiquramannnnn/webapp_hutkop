@@ -39,14 +39,14 @@
       </div>
     </div>
 
-    <!-- Grafik -->
+    <!-- Grafik Row 1 -->
     <div class="row g-4 mt-2">
       <div class="col-md-6">
         <div class="card h-100">
           <div class="card-header bg-primary text-white text-center">
             Grafik Status Cicilan
           </div>
-          <div class="card-body chart-container">
+          <div class="card-body chart-container-small">
             <canvas id="statusChart"></canvas>
           </div>
         </div>
@@ -57,8 +57,33 @@
           <div class="card-header bg-success text-white text-center">
             Grafik Bagian/Divisi
           </div>
-          <div class="card-body chart-container">
+          <div class="card-body chart-container-small">
             <canvas id="bagianChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Grafik Row 2 -->
+    <div class="row g-4 mt-2">
+      <div class="col-md-6">
+        <div class="card h-100">
+          <div class="card-header bg-warning text-white text-center">
+            Top 10 Karyawan (Cicilan Terbesar)
+          </div>
+          <div class="card-body chart-container-large">
+            <canvas id="topBorrowersChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="card h-100">
+          <div class="card-header bg-danger text-white text-center">
+            Total Cicilan per Divisi
+          </div>
+          <div class="card-body chart-container-large">
+            <canvas id="bagianCicilanChart"></canvas>
           </div>
         </div>
       </div>
@@ -72,7 +97,7 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
   <script>
-    // ✅ Data untuk chart status (dibungkus JSON.parse biar VS Code ga error)
+    // ✅ Data untuk chart status
     const statusLabels = JSON.parse(`{{ status_count.keys()|list|tojson|safe if status_count else '[]' }}`);
     const statusData   = JSON.parse(`{{ status_count.values()|list|tojson|safe if status_count else '[]' }}`);
 
@@ -95,7 +120,7 @@
       }
     });
 
-    // ✅ Data untuk chart bagian/divisi (dibungkus JSON.parse juga)
+    // ✅ Data untuk chart bagian/divisi
     const bagianLabels = JSON.parse(`{{ bagian_count.keys()|list|tojson|safe if bagian_count else '[]' }}`);
     const bagianData   = JSON.parse(`{{ bagian_count.values()|list|tojson|safe if bagian_count else '[]' }}`);
 
@@ -113,15 +138,80 @@
         indexAxis: 'y',
         responsive: true,
         maintainAspectRatio: false,
-        layout: {
-          padding: { bottom: 20 } // ✅ Biar label ga ketekan
-        },
+        layout: { padding: { bottom: 20 } },
+        plugins: { legend: { display: false } },
+        animation: { duration: 1200, easing: 'easeOutQuart' },
+        scales: {
+          y: {
+            ticks: { autoSkip: false }
+          }
+        }
+      }
+    });
+
+    // ✅ Data untuk Top 10 Borrowers (nama di bawah, Rp di kiri)
+    const borrowerLabels = JSON.parse(`{{ top_borrowers|map(attribute='nama')|list|tojson|safe if top_borrowers else '[]' }}`);
+    const borrowerData   = JSON.parse(`{{ top_borrowers|map(attribute='cicil')|list|tojson|safe if top_borrowers else '[]' }}`);
+
+    new Chart(document.getElementById('topBorrowersChart'), {
+      type: 'bar',
+      data: {
+        labels: borrowerLabels,
+        datasets: [{
+          label: 'Cicilan (Rp)',
+          data: borrowerData,
+          backgroundColor: '#fd7e14'
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
         plugins: { legend: { display: false } },
         animation: { duration: 1200, easing: 'easeOutQuart' },
         scales: {
           y: {
             ticks: {
-              autoSkip: false // ✅ Biar semua label bagian tampil
+              callback: value => 'Rp ' + value.toLocaleString()
+            }
+          },
+          x: {
+            ticks: {
+              autoSkip: false
+            }
+          }
+        }
+      }
+    });
+
+    // ✅ Data untuk Total Cicilan per Divisi
+    const bagianCicilanLabels = JSON.parse(`{{ bagian_cicilan.keys()|list|tojson|safe if bagian_cicilan else '[]' }}`);
+    const bagianCicilanData   = JSON.parse(`{{ bagian_cicilan.values()|list|tojson|safe if bagian_cicilan else '[]' }}`);
+
+    new Chart(document.getElementById('bagianCicilanChart'), {
+      type: 'bar',
+      data: {
+        labels: bagianCicilanLabels,
+        datasets: [{
+          label: 'Total Cicilan (Rp)',
+          data: bagianCicilanData,
+          backgroundColor: '#dc3545'
+        }]
+      },
+      options: {
+        indexAxis: 'y',
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        animation: { duration: 1200, easing: 'easeOutQuart' },
+        scales: {
+          x: {
+            ticks: {
+              callback: value => 'Rp ' + value.toLocaleString()
+            }
+          },
+          y: {
+            ticks: {
+              autoSkip: false
             }
           }
         }
