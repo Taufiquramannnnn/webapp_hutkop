@@ -20,7 +20,7 @@ from werkzeug.utils import secure_filename
 # REPORTLAB (digunakan untuk export PDF)
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph
 from reportlab.lib import colors
-from reportlab.lib.pagesizes import A4, landscape, portrait
+from reportlab.lib.pagesizes import A4, portrait
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.enums import TA_CENTER, TA_LEFT
 from reportlab.lib.units import cm
@@ -58,7 +58,7 @@ COLUMN_MAPPING = {
     "JML": "Total Pinjaman (Rp)",
     "LAMA": "Total Tenor (Bln)",
     "CICIL": "Cicilan/Bulan (Rp)",
-    "ANGSURAN_KE": "Pembayaran (x)",
+    "ANGSURAN_KE": "Pembayaran", 
     "SISA_ANGSURAN": "Sisa Tenor (Bln)",
     "SISA_CICILAN": "Sisa Pinjaman (Rp)",
     "STATUS": "Status"
@@ -357,7 +357,7 @@ def export_pdf():
 
         elements = [Paragraph("Data Koperasi Karyawan (Total Gabungan)", style_title)]
         
-        # Wrapping header text
+        # Wrapping header text for better fit in portrait
         header_text = {
             "NOPEG": "No.<br/>Pegawai",
             "NAMA": "Nama Karyawan",
@@ -365,7 +365,7 @@ def export_pdf():
             "JML": "Total<br/>Pinjaman<br/>(Rp)",
             "LAMA": "Total<br/>Tenor<br/>(Bln)",
             "CICIL": "Cicilan/<br/>Bulan<br/>(Rp)",
-            "ANGSURAN_KE": "Pembayaran<br/>(x)",
+            "ANGSURAN_KE": "Pembayaran", 
             "SISA_ANGSURAN": "Sisa<br/>Tenor<br/>(Bln)",
             "SISA_CICILAN": "Sisa<br/>Pinjaman<br/>(Rp)",
             "STATUS": "Status"
@@ -388,14 +388,13 @@ def export_pdf():
                 Paragraph(str(row.get("STATUS", "")), style_body_center)
             ])
         
-        # Adjust column widths for Portrait
-        col_widths = [2.2*cm, 3.5*cm, 2.2*cm, 2.2*cm, 1.5*cm, 2.2*cm, 1.5*cm, 1.5*cm, 2.2*cm, 1.5*cm]
+        col_widths = [1.8*cm, 4.5*cm, 2*cm, 2*cm, 1*cm, 2*cm, 1.5*cm, 1.5*cm, 2.2*cm, 1.3*cm]
         
         table = Table(table_data, colWidths=col_widths, repeatRows=1)
         
         tbl_style = TableStyle([
             ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#343a40")),
-            ("TEXTCOLOR", (0, 0), (-1, 0), colors.whitesmoke), # Font color for header
+            ("TEXTCOLOR", (0, 0), (-1, 0), colors.whitesmoke),
             ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
             ("GRID", (0, 0), (-1, -1), 0.5, colors.grey),
             ("BOTTOMPADDING", (0, 0), (-1, -1), 4),
@@ -475,4 +474,3 @@ if __name__ == "__main__":
         webbrowser.open("http://127.0.0.1:5000/")
     threading.Timer(1.0, open_browser).start()
     app.run(debug=False)
-
