@@ -110,7 +110,7 @@
                         <tr>
                             <td colspan="{{ column_headers|length }}" class="text-center py-5">
                                 <h5 class="text-muted">📁 Data Belum Ada</h5>
-                                <p>Silakan unggah file data atau sesuaikan filter Anda.</p>
+                                <p>Silahkan unggah file data atau sesuaikan filter Anda.</p>
                             </td>
                         </tr>
                     {% endif %}
@@ -150,11 +150,11 @@
                             <i class="bi bi-upload me-2"></i> Pilih File DBF
                         </label>
                         <input type="file" class="form-control d-none" id="importFile" name="file" multiple onchange="this.form.submit()">
-                        <small class="text-muted">Bisa pilih banyak file sekaligus</small>
+                        <small class="text-muted">Bisa masukkan banyak file sekaligus</small>
                     </form>
                 </div>
                 <div class="col-md-4 text-center">
-                    <h6 class="fw-bold">Ekspor Laporan</h6>
+                    <h6 class="fw-bold">Export Laporan</h6>
                     <div class="d-flex w-100 justify-content-center">
                         <a href="{{ url_for('export_csv') }}" class="btn btn-success me-2 flex-fill" title="Export ke CSV">
                             <i class="bi bi-file-earmark-spreadsheet-fill"></i>
