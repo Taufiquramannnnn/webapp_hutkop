@@ -8,16 +8,16 @@ Dilengkapi dengan fitur filter, pencarian, dan ekspor ke format **PDF, CSV, dan 
 
 ## 🚀 Fitur Utama
 
--   🔹 **Import Multi-File**: Unggah beberapa file `.dbf` atau `.xlsx` sekaligus.
--   🔹 **Agregasi Data Cerdas**: Secara otomatis menjumlahkan total pinjaman, tenor, cicilan, dan sisa angsuran untuk karyawan yang sama yang datanya tersebar di beberapa file.
--   🔹 **Reset Data**: Fitur untuk menghapus semua data yang telah diunggah, memungkinkan perhitungan ulang dari awal dengan mudah.
--   🔹 **Filter & Pencarian Lanjutan**: Cari data berdasarkan nama, nomor pegawai, divisi, atau status pinjaman (Lunas, Berjalan, Belum Bayar).
--   🔹 **Ekspor Profesional**: Ekspor data gabungan ke format **PDF** (dengan layout rapi), **CSV**, dan **Excel**.
--   🔹 **Dashboard Interaktif**: Visualisasikan data dengan ringkasan KPI (total pinjaman, sisa pinjaman, jumlah peminjam) dan grafik interaktif yang menampilkan:
-    -   Distribusi Status Pinjaman
-    -   Top 10 Peminjam Terbesar
-    -   Top 10 Divisi berdasarkan Jumlah Peminjam
-    -   Top 10 Divisi berdasarkan Total Pinjaman
+🔹 **Import Multi-File**: Unggah beberapa file `.dbf` atau `.xlsx` sekaligus.
+🔹 **Agregasi Data Cerdas**: Secara otomatis menjumlahkan total pinjaman, tenor, cicilan, dan sisa angsuran untuk karyawan yang sama yang datanya tersebar di beberapa file.
+🔹 **Reset Data**: Fitur untuk menghapus semua data yang telah diunggah, memungkinkan perhitungan ulang dari awal dengan mudah.
+🔹 **Filter & Pencarian Lanjutan**: Cari data berdasarkan nama, nomor pegawai, divisi, atau status pinjaman (Lunas, Berjalan, Belum Bayar).
+🔹 **Ekspor Profesional**: Ekspor data gabungan ke format **PDF** (dengan layout rapi), **CSV**, dan **Excel**.
+🔹 **Dashboard Interaktif**: Visualisasikan data dengan ringkasan KPI (total pinjaman, sisa pinjaman, jumlah peminjam) dan grafik interaktif yang menampilkan:
+    🔹   Distribusi Status Pinjaman
+    🔹   Top 10 Peminjam Terbesar
+    🔹   Top 10 Divisi berdasarkan Jumlah Peminjam
+    🔹   Top 10 Divisi berdasarkan Total Pinjaman
 
 ---
 
