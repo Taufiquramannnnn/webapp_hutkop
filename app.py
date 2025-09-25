@@ -50,7 +50,7 @@ def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-# Nama Kolom yang Lebih Profesional untuk Tampilan Web dan PDF
+# Nama Kolom untuk Tampilan Web dan PDF
 COLUMN_MAPPING = {
     "NOPEG": "No. Pegawai",
     "NAMA": "Nama Karyawan",
@@ -388,7 +388,7 @@ def export_pdf():
                 Paragraph(str(row.get("STATUS", "")), style_body_center)
             ])
         
-        col_widths = [1.8*cm, 4.5*cm, 2*cm, 2*cm, 1*cm, 2*cm, 1.5*cm, 1.5*cm, 2.2*cm, 1.3*cm]
+        col_widths = [2.1*cm, 4*cm, 2.2*cm, 2*cm, 1.7*cm, 2*cm, 1.4*cm, 1.4*cm, 1.8*cm, 1.7*cm]
         
         table = Table(table_data, colWidths=col_widths, repeatRows=1)
         
