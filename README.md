@@ -14,10 +14,10 @@ Dilengkapi dengan fitur filter, pencarian, dan ekspor ke format **PDF, CSV, dan 
 -    **Filter & Pencarian Lanjutan**: Cari data berdasarkan nama, nomor pegawai, divisi, atau status pinjaman (Lunas, Berjalan, Belum Bayar).
 -    **Ekspor Profesional**: Ekspor data gabungan ke format **PDF** (dengan layout rapi), **CSV**, dan **Excel**.
 -    **Dashboard Interaktif**: Visualisasikan data dengan ringkasan KPI (total pinjaman, sisa pinjaman, jumlah peminjam) dan grafik interaktif yang menampilkan:
-    -   Distribusi Status Pinjaman
-    -   Top 10 Peminjam Terbesar
-    -   Top 10 Divisi berdasarkan Jumlah Peminjam
-    -   Top 10 Divisi berdasarkan Total Pinjaman
+     -   Distribusi Status Pinjaman
+     -   Top 10 Peminjam Terbesar
+     -   Top 10 Divisi berdasarkan Jumlah Peminjam
+     -   Top 10 Divisi berdasarkan Total Pinjaman
 
 ---
 
