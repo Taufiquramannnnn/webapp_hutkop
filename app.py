@@ -408,7 +408,6 @@ def export_pdf():
         flash("Terjadi kesalahan saat mengekspor data ke PDF", "danger")
         return redirect(url_for("index"))
 
-
 @app.route("/dashboard")
 def dashboard():
     """Halaman ringkasan statistik"""
@@ -419,17 +418,36 @@ def dashboard():
             return render_template(
                 "dashboard.html", title="Dashboard Ringkasan",
                 total_pinjaman=0, sisa_pinjaman=0, total_karyawan=0,
-                status_count={}, bagian_count={}, top_borrowers=[], bagian_pinjaman={}
+                status_count={}, bagian_count={}, top_borrowers=[], bagian_pinjaman={},
+                status_details={}
             )
 
-        # ===== PERUBAHAN LOGIKA PERHITUNGAN STATUS DI SINI vvv =====
+        # ===== PERUBAHAN UTAMA DI SINI vvv =====
         status_count = {"Lunas": 0, "Berjalan": 0, "Belum Bayar": 0}
+        status_amount = {"Lunas": 0, "Berjalan": 0, "Belum Bayar": 0}
+
         for r in all_data:
-            # Menggunakan status summary yang sudah dihitung di load_data
             status = r["SUMMARY"]["STATUS"]
             if status in status_count:
                 status_count[status] += 1
+            
+            # Hitung total sisa pinjaman untuk setiap status
+            if status == "Lunas":
+                status_amount["Lunas"] += 0 # Sisa pinjaman lunas adalah 0
+            else:
+                status_amount[status] += r["SUMMARY"]["SISA_CICILAN"]
+
+        total_karyawan = len(all_data)
+
+        # Siapkan data detail untuk tooltip
+        status_details = {
+            "labels": list(status_count.keys()),
+            "counts": list(status_count.values()),
+            "amounts": list(status_amount.values()),
+            "percentages": [round((count / total_karyawan) * 100, 1) if total_karyawan > 0 else 0 for count in status_count.values()]
+        }
         
+        # --- Sisa kode tetap sama ---
         bagian_count_raw = {}
         bagian_pinjaman_raw = {}
         for r in all_data:
@@ -445,8 +463,7 @@ def dashboard():
         
         total_pinjaman = sum(r["SUMMARY"].get('JML', 0) for r in all_data)
         sisa_pinjaman = sum(r["SUMMARY"].get('SISA_CICILAN', 0) for r in all_data)
-        total_karyawan = len(all_data)
-
+        
         sorted_by_pinjaman = sorted(all_data, key=lambda x: x["SUMMARY"].get("JML", 0), reverse=True)
         top_borrowers = [
             {"nama": r["NAMA"], "jumlah": r["SUMMARY"]["JML"]}
@@ -456,7 +473,7 @@ def dashboard():
         return render_template(
             "dashboard.html",
             title="Dashboard Ringkasan",
-            status_count=status_count,
+            status_details=status_details,
             bagian_count=top_10_bagian_count,
             bagian_pinjaman=top_10_bagian_pinjaman,
             total_pinjaman=total_pinjaman,

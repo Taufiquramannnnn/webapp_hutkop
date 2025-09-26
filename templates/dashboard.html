@@ -139,22 +139,62 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
-        // Data untuk chart status
-        const statusLabels = JSON.parse(`{{ status_count.keys()|list|tojson|safe }}`);
-        const statusData = JSON.parse(`{{ status_count.values()|list|tojson|safe }}`);
+        // Fungsi untuk format Rupiah
+        const formatRupiah = (value) => {
+            return new Intl.NumberFormat('id-ID', {
+                style: 'currency',
+                currency: 'IDR',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            }).format(value);
+        };
+
+        // ===== PERUBAHAN UTAMA DI SINI vvv =====
+        // Data untuk chart status (sekarang lebih detail)
+        const statusDetails = JSON.parse(`{{ status_details|tojson|safe }}`);
+        
         new Chart(document.getElementById('statusChart'), {
             type: 'doughnut',
             data: {
-                labels: statusLabels,
+                labels: statusDetails.labels,
                 datasets: [{
-                    data: statusData,
-                    backgroundColor: ['#28a745', '#007bff', '#ffc107'],
+                    data: statusDetails.counts,
+                    backgroundColor: ['#28a745', '#007bff', '#ffc107'], // Lunas, Berjalan, Belum Bayar
                     borderColor: '#fff',
                     borderWidth: 2
                 }]
             },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+            options: { 
+                responsive: true, 
+                maintainAspectRatio: false, 
+                plugins: { 
+                    legend: { position: 'bottom' },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const label = context.label || '';
+                                const count = statusDetails.counts[context.dataIndex];
+                                const percentage = statusDetails.percentages[context.dataIndex];
+                                const amount = statusDetails.amounts[context.dataIndex];
+
+                                const countText = `${count} Karyawan (${percentage}%)`;
+                                const amountText = `Sisa Pinjaman: ${formatRupiah(amount)}`;
+
+                                return `${label}: ${countText}`;
+                            },
+                             afterLabel: function(context) {
+                                const amount = statusDetails.amounts[context.dataIndex];
+                                if (context.label !== 'Lunas') {
+                                    return `Sisa Pinjaman: ${formatRupiah(amount)}`;
+                                }
+                                return null;
+                            }
+                        }
+                    }
+                } 
+            }
         });
+        // ===== PERUBAHAN DI SINI ^^^ =====
 
         // Data untuk chart bagian/divisi (jumlah karyawan)
         const bagianLabels = JSON.parse(`{{ bagian_count.keys()|list|tojson|safe }}`);
