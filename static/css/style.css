@@ -6,7 +6,7 @@
 /* Background & Font Dasar */
 body {
     background-color: #f0f2f5;
-    font-family: "Segoe UI", Roboto, Arial, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
 .container {
@@ -24,41 +24,64 @@ body {
 /* Styling Tabel Utama */
 .table-responsive {
     border-radius: 0.5rem;
-    overflow: hidden;
+    overflow-x: auto;
     border: 1px solid #dee2e6;
 }
 
 .table thead th {
-    background-color: #212529; /* Warna hitam lebih pekat */
+    background-color: #2c3e50; /* Warna biru dongker yang lebih modern */
     color: #ffffff;
     vertical-align: middle;
     text-align: center;
     font-weight: 600;
-    white-space: nowrap; /* Mencegah header patah ke baris baru */
-    padding: 0.9rem 0.5rem;
+    white-space: nowrap;
+    padding: 0.9rem 0.75rem;
 }
 
 .table tbody td {
     vertical-align: middle;
-    padding: 0.75rem 0.5rem;
+    padding: 0.75rem;
+    text-align: center; /* Default align center untuk semua cell */
 }
 
-/* Penataan rata kiri untuk kolom teks */
-.table td.nopeg-col,
-.table td.nama-col,
-.table td.bagian-col {
+/* Override alignment untuk kolom teks agar rata kiri */
+.table tbody tr.expandable-row td:nth-child(2), /* Kolom NOPEG */
+.table tbody tr.expandable-row td:nth-child(3), /* Kolom Nama */
+.table tbody tr.expandable-row td:nth-child(4) { /* Kolom Divisi */
     text-align: left !important;
-    padding-left: 1rem;
 }
 
-.table td.nama-col {
+.table tbody tr.expandable-row td:nth-child(3) {
     font-weight: 500;
 }
 
-/* Penataan rata tengah untuk kolom angka dan status */
-.table td.center-col {
-    text-align: center !important;
+
+/* Styling untuk baris yang bisa di-klik */
+.expandable-row {
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
 }
+.expandable-row:hover {
+    background-color: #e9f5ff;
+}
+.expandable-row i.bi {
+    transition: transform 0.3s ease;
+}
+.expandable-row[aria-expanded="true"] i.bi {
+    transform: rotate(180deg);
+}
+.expandable-row[aria-expanded="true"] {
+    background-color: #d1e7fd;
+}
+
+
+/* Styling untuk kontainer tabel detail */
+.details-table-container {
+    padding: 1.25rem;
+    background-color: #f8f9fa;
+    border-top: 2px solid #0d6efd;
+}
+
 
 /* Pagination */
 .pagination .page-item .page-link {
@@ -89,7 +112,7 @@ body {
 /* Flash Messages (Pesan Notifikasi) */
 .flash-messages {
     position: fixed;
-    top: 80px; /* Di bawah navbar */
+    top: 80px;
     right: 20px;
     z-index: 1050;
     min-width: 300px;

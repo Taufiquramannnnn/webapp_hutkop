@@ -72,29 +72,37 @@
         </div>
 
         <div class="table-responsive">
-            <table class="table table-striped table-hover mb-0">
-                <thead>
+            <table class="table table-hover mb-0">
+                <thead class="table-dark">
                     <tr>
-                        {% for key, header_name in column_headers.items() %}
-                            <th scope="col">{{ header_name }}</th>
-                        {% endfor %}
+                        <th style="width: 5%;"></th> <th scope="col">{{ column_headers['NOPEG'] }}</th>
+                        <th scope="col">{{ column_headers['NAMA'] }}</th>
+                        <th scope="col">{{ column_headers['BAGIAN'] }}</th>
+                        <th scope="col">{{ column_headers['JML'] }}</th>
+                        <th scope="col">{{ column_headers['LAMA'] }}</th>
+                        <th scope="col">{{ column_headers['ANGSURAN_KE'] }}</th>
+                        <th scope="col">{{ column_headers['SISA_ANGSURAN'] }}</th>
+                        <th scope="col">{{ column_headers['SISA_CICILAN'] }}</th>
+                        <th scope="col">{{ column_headers['STATUS'] }}</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% if data %}
                         {% for row in data %}
-                            <tr>
-                                <td class="nopeg-col">{{ row.get('NOPEG', '-') }}</td>
-                                <td class="nama-col">{{ row.get('NAMA', '-') }}</td>
-                                <td class="bagian-col">{{ row.get('BAGIAN', '-') }}</td>
-                                <td class="center-col">Rp {{ "{:,.0f}".format(row.get('JML', 0)) }}</td>
-                                <td class="center-col">{{ row.get('LAMA', 0) }}</td>
-                                <td class="center-col">Rp {{ "{:,.0f}".format(row.get('CICIL', 0)) }}</td>
-                                <td class="center-col">{{ row.get('ANGSURAN_KE', 0) }}</td>
-                                <td class="center-col">{{ row.get('SISA_ANGSURAN', 0) }}</td>
-                                <td class="center-col fw-bold">Rp {{ "{:,.0f}".format(row.get('SISA_CICILAN', 0)) }}</td>
-                                <td class="center-col">
-                                    {% set status = row.get('STATUS', '') %}
+                            <tr class="expandable-row" data-bs-toggle="collapse" href="#details-{{ row.NOPEG | replace('.', '') }}">
+                                <td>
+                                    <i class="bi bi-chevron-down"></i>
+                                </td>
+                                <td>{{ row.get('NOPEG', '-') }}</td>
+                                <td class="text-start">{{ row.get('NAMA', '-') }}</td>
+                                <td class="text-start">{{ row.get('BAGIAN', '-') }}</td>
+                                <td class="text-center">Rp {{ "{:,.0f}".format(row.SUMMARY.get('JML', 0)) }}</td>
+                                <td class="text-center">{{ row.SUMMARY.get('LAMA', 0) }}</td>
+                                <td class="text-center">{{ row.SUMMARY.get('ANGSURAN_KE', 0) }}</td>
+                                <td class="text-center">{{ row.SUMMARY.get('SISA_ANGSURAN', 0) }}</td>
+                                <td class="text-center fw-bold">Rp {{ "{:,.0f}".format(row.SUMMARY.get('SISA_CICILAN', 0)) }}</td>
+                                <td class="text-center">
+                                    {% set status = row.SUMMARY.get('STATUS', '') %}
                                     <span class="badge 
                                         {% if status == 'Lunas' %} bg-success
                                         {% elif status == 'Berjalan' %} bg-primary
@@ -105,12 +113,55 @@
                                     </span>
                                 </td>
                             </tr>
+                            <tr class="collapse" id="details-{{ row.NOPEG | replace('.', '') }}">
+                                <td colspan="10" class="p-0">
+                                    <div class="details-table-container">
+                                        <h6 class="mb-2"><strong>Rincian Pinjaman untuk {{ row.NAMA }}:</strong> ({{ row.DETAILS|length }} Pinjaman)</h6>
+                                        <table class="table table-bordered table-sm mb-0">
+                                            <thead class="table-secondary">
+                                                <tr>
+                                                    <th>Pinjaman (Rp)</th>
+                                                    <th>Tenor (Bln)</th>
+                                                    <th>Cicilan/Bln (Rp)</th>
+                                                    <th>Pembayaran (x)</th>
+                                                    <th>Sisa Tenor (Bln)</th>
+                                                    <th>Sisa Pinjaman (Rp)</th>
+                                                    <th>Status</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for detail in row.DETAILS %}
+                                                <tr>
+                                                    <td class="text-center">Rp {{ "{:,.0f}".format(detail.get('JML', 0)) }}</td>
+                                                    <td class="text-center">{{ detail.get('LAMA', 0) }}</td>
+                                                    <td class="text-center">Rp {{ "{:,.0f}".format(detail.get('CICIL', 0)) }}</td>
+                                                    <td class="text-center">{{ detail.get('ANGSURAN_KE', 0) }}</td>
+                                                    <td class="text-center">{{ detail.get('SISA_ANGSURAN', 0) }}</td>
+                                                    <td class="text-center">Rp {{ "{:,.0f}".format(detail.get('SISA_CICILAN', 0)) }}</td>
+                                                    <td class="text-center">
+                                                        {% set detail_status = detail.get('STATUS', '') %}
+                                                        <span class="badge 
+                                                            {% if detail_status == 'Lunas' %} bg-success-subtle text-success-emphasis
+                                                            {% elif detail_status == 'Berjalan' %} bg-primary-subtle text-primary-emphasis
+                                                            {% elif detail_status == 'Belum Bayar' %} bg-warning-subtle text-warning-emphasis
+                                                            {% else %} bg-secondary-subtle text-secondary-emphasis
+                                                            {% endif %}">
+                                                            {{ detail_status }}
+                                                        </span>
+                                                    </td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </td>
+                            </tr>
                         {% endfor %}
                     {% else %}
                         <tr>
-                            <td colspan="{{ column_headers|length }}" class="text-center py-5">
+                            <td colspan="10" class="text-center py-5">
                                 <h5 class="text-muted">📁 Data Belum Ada</h5>
-                                <p>Silahkan unggah file data atau sesuaikan filter Anda.</p>
+                                <p>Silakan unggah file data atau sesuaikan filter Anda.</p>
                             </td>
                         </tr>
                     {% endif %}
@@ -139,7 +190,7 @@
             </ul>
             {% endif %}
         </nav>
-
+        
         <div class="card shadow-sm p-4 mt-5">
             <h5 class="fw-bold mb-3 text-dark text-center">Opsi Data & Laporan</h5>
             <div class="row g-3 justify-content-center">
@@ -147,14 +198,14 @@
                     <h6 class="fw-bold">Upload Data</h6>
                     <form action="{{ url_for('import_file') }}" method="POST" enctype="multipart/form-data" class="d-flex flex-column align-items-center">
                         <label for="importFile" class="form-label btn btn-outline-primary w-100 mb-2">
-                            <i class="bi bi-upload me-2"></i> Pilih File DBF
+                            <i class="bi bi-upload me-2"></i> Pilih File DBF/Excel
                         </label>
                         <input type="file" class="form-control d-none" id="importFile" name="file" multiple onchange="this.form.submit()">
-                        <small class="text-muted">Bisa masukkan banyak file sekaligus</small>
+                        <small class="text-muted">Bisa pilih banyak file sekaligus</small>
                     </form>
                 </div>
                 <div class="col-md-4 text-center">
-                    <h6 class="fw-bold">Export Laporan</h6>
+                    <h6 class="fw-bold">Ekspor Laporan</h6>
                     <div class="d-flex w-100 justify-content-center">
                         <a href="{{ url_for('export_csv') }}" class="btn btn-success me-2 flex-fill" title="Export ke CSV">
                             <i class="bi bi-file-earmark-spreadsheet-fill"></i>

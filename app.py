@@ -4,8 +4,7 @@ app.py
 Aplikasi utama Flask.
 - Load data dari DBF / Excel (sekarang multiple files di folder uploads/)
 - Agregasi (jumlahkan) data untuk NOPEG yang sama dari file berbeda.
-- Tampilkan di halaman web, export, dan import.
-- Tambahan fitur reset data.
+- Menampilkan data dalam format master-detail (ringkasan & rincian).
 """
 
 import os
@@ -36,7 +35,7 @@ app = Flask(__name__)
 app.secret_key = "supersecret"
 UPLOAD_FOLDER = "uploads"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-os.makedirs("static/css", exist_ok=True) # Pastikan folder static/css ada
+os.makedirs("static/css", exist_ok=True)
 
 # Setup logging
 logging.basicConfig(level=logging.INFO)
@@ -50,15 +49,14 @@ def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-# Nama Kolom untuk Tampilan Web dan PDF
+# Nama Kolom yang Lebih Profesional untuk Tampilan Web dan PDF
 COLUMN_MAPPING = {
     "NOPEG": "No. Pegawai",
     "NAMA": "Nama Karyawan",
     "BAGIAN": "Divisi",
     "JML": "Total Pinjaman (Rp)",
     "LAMA": "Total Tenor (Bln)",
-    "CICIL": "Cicilan/Bulan (Rp)",
-    "ANGSURAN_KE": "Pembayaran", 
+    "ANGSURAN_KE": "Pembayaran",
     "SISA_ANGSURAN": "Sisa Tenor (Bln)",
     "SISA_CICILAN": "Sisa Pinjaman (Rp)",
     "STATUS": "Status"
@@ -104,7 +102,7 @@ def normalize_row(row):
     r["NOPEG"] = str(r.get("NOPEG") or "").strip()
     r["NAMA"] = str(r.get("NAMA") or "").strip()
     r["BAGIAN"] = str(r.get("BAGIAN") or "").strip()
-
+    
     try:
         r["JML"] = float(r.get("JML") or r.get("JML_DDL") or r.get("JUMLAH") or 0)
     except (ValueError, TypeError):
@@ -135,8 +133,8 @@ def normalize_row(row):
 
 def load_data():
     """
-    Load data dari semua file di folder uploads/, lalu AGREGASI (jumlahkan)
-    data untuk NOPEG yang sama.
+    Load data dari semua file di folder uploads/, lalu kelompokkan per NOPEG.
+    Hasilnya adalah list of dict, dimana setiap dict berisi data summary dan details.
     """
     try:
         pattern_dbf = os.path.join(UPLOAD_FOLDER, "*.dbf")
@@ -144,13 +142,10 @@ def load_data():
         files = glob.glob(pattern_dbf) + glob.glob(pattern_xlsx)
 
         if not files:
-            logger.warning("No data files found in uploads/")
             return []
 
-        data_aggregator = {}
-
+        all_loans_by_nopeg = {}
         for path in files:
-            logger.info(f"Loading and aggregating file: {path}")
             raw = []
             if path.lower().endswith(".dbf"):
                 raw = read_dbf_file(path)
@@ -162,50 +157,47 @@ def load_data():
                 nopeg = proc.get("NOPEG")
                 if not nopeg:
                     continue
+                if nopeg not in all_loans_by_nopeg:
+                    all_loans_by_nopeg[nopeg] = []
+                all_loans_by_nopeg[nopeg].append(proc)
 
-                if nopeg not in data_aggregator:
-                    data_aggregator[nopeg] = {
-                        "NOPEG": proc["NOPEG"], "NAMA": proc["NAMA"], "BAGIAN": proc["BAGIAN"],
-                        "JML": proc["JML"], "LAMA": proc["LAMA"], "CICIL": proc["CICIL"],
-                        "ANGSURAN_KE": proc["ANGSURAN_KE"], "SISA_ANGSURAN": proc["SISA_ANGSURAN"],
-                        "SISA_CICILAN": proc["SISA_CICILAN"],
-                        "STATUS_LIST": [proc["STATUS"]]
-                    }
-                else:
-                    agg = data_aggregator[nopeg]
-                    agg["JML"] += proc["JML"]
-                    agg["LAMA"] += proc["LAMA"]
-                    agg["CICIL"] += proc["CICIL"]
-                    agg["ANGSURAN_KE"] += proc["ANGSURAN_KE"]
-                    agg["SISA_ANGSURAN"] += proc["SISA_ANGSURAN"]
-                    agg["SISA_CICILAN"] += proc["SISA_CICILAN"]
-                    agg["STATUS_LIST"].append(proc["STATUS"])
-                    if proc["NAMA"]: agg["NAMA"] = proc["NAMA"]
-                    if proc["BAGIAN"]: agg["BAGIAN"] = proc["BAGIAN"]
-
-        final_rows = []
-        for nopeg, agg_data in data_aggregator.items():
-            statuses = set(agg_data["STATUS_LIST"])
-            if "Berjalan" in statuses:
-                agg_data["STATUS"] = "Berjalan"
-            elif "Belum Bayar" in statuses:
-                 agg_data["STATUS"] = "Belum Bayar"
-            else:
-                agg_data["STATUS"] = "Lunas"
+        final_data = []
+        for nopeg, loans in all_loans_by_nopeg.items():
+            summary = {
+                "JML": sum(l['JML'] for l in loans),
+                "LAMA": sum(l['LAMA'] for l in loans),
+                "ANGSURAN_KE": sum(l['ANGSURAN_KE'] for l in loans),
+                "SISA_ANGSURAN": sum(l['SISA_ANGSURAN'] for l in loans),
+                "SISA_CICILAN": sum(l['SISA_CICILAN'] for l in loans)
+            }
             
-            del agg_data["STATUS_LIST"]
-            final_rows.append(agg_data)
+            statuses = {l['STATUS'] for l in loans}
+            if "Berjalan" in statuses:
+                summary['STATUS'] = "Berjalan"
+            elif "Belum Bayar" in statuses:
+                 summary['STATUS'] = "Belum Bayar"
+            else:
+                summary['STATUS'] = "Lunas"
 
-        return final_rows
+            person_data = {
+                "NOPEG": nopeg,
+                "NAMA": loans[-1]['NAMA'],
+                "BAGIAN": loans[-1]['BAGIAN'],
+                "SUMMARY": summary,
+                "DETAILS": loans
+            }
+            final_data.append(person_data)
+            
+        return final_data
 
     except Exception as e:
         logger.error(f"Error loading data: {str(e)}")
         return []
 
+
 # =============================
 # Routes
 # =============================
-
 @app.route("/", methods=["GET"])
 def index():
     """Halaman utama + filter & pagination"""
@@ -221,10 +213,10 @@ def index():
         filtered = all_data
         if q:
             filtered = [r for r in filtered if q in (r.get("NAMA") or "").lower() or q in (r.get("NOPEG") or "").lower()]
-        if bagian_filter and bagian_filter.lower() != "":
+        if bagian_filter:
             filtered = [r for r in filtered if (r.get("BAGIAN") or "").lower() == bagian_filter.lower()]
-        if status_filter and status_filter.lower() != "":
-            filtered = [r for r in filtered if (r.get("STATUS") or "").lower() == status_filter.lower()]
+        if status_filter:
+            filtered = [r for r in filtered if (r.get("SUMMARY", {}).get("STATUS") or "").lower() == status_filter.lower()]
 
         total_data = len(filtered)
         total_pages = (total_data + per_page - 1) // per_page
@@ -309,7 +301,13 @@ def import_file():
 def export_csv():
     try:
         data = load_data()
-        df = pd.DataFrame(data)
+        flat_data = []
+        for item in data:
+            row = {"NOPEG": item["NOPEG"], "NAMA": item["NAMA"], "BAGIAN": item["BAGIAN"]}
+            row.update(item["SUMMARY"])
+            flat_data.append(row)
+
+        df = pd.DataFrame(flat_data)
         df = df[list(COLUMN_MAPPING.keys())]
         df = df.rename(columns=COLUMN_MAPPING)
         filename = "export_data_koperasi.csv"
@@ -325,7 +323,13 @@ def export_csv():
 def export_excel():
     try:
         data = load_data()
-        df = pd.DataFrame(data)
+        flat_data = []
+        for item in data:
+            row = {"NOPEG": item["NOPEG"], "NAMA": item["NAMA"], "BAGIAN": item["BAGIAN"]}
+            row.update(item["SUMMARY"])
+            flat_data.append(row)
+            
+        df = pd.DataFrame(flat_data)
         df = df[list(COLUMN_MAPPING.keys())]
         df = df.rename(columns=COLUMN_MAPPING)
         filename = "export_data_koperasi.xlsx"
@@ -357,39 +361,32 @@ def export_pdf():
 
         elements = [Paragraph("Data Koperasi Karyawan (Total Gabungan)", style_title)]
         
-        # Wrapping header text for better fit in portrait
         header_text = {
-            "NOPEG": "No.<br/>Pegawai",
-            "NAMA": "Nama Karyawan",
-            "BAGIAN": "Divisi",
-            "JML": "Total<br/>Pinjaman<br/>(Rp)",
-            "LAMA": "Total<br/>Tenor<br/>(Bln)",
-            "CICIL": "Cicilan/<br/>Bulan<br/>(Rp)",
-            "ANGSURAN_KE": "Pembayaran", 
-            "SISA_ANGSURAN": "Sisa<br/>Tenor<br/>(Bln)",
-            "SISA_CICILAN": "Sisa<br/>Pinjaman<br/>(Rp)",
-            "STATUS": "Status"
+            "NOPEG": "No.<br/>Pegawai", "NAMA": "Nama Karyawan", "BAGIAN": "Divisi",
+            "JML": "Total<br/>Pinjaman<br/>(Rp)", "LAMA": "Total<br/>Tenor<br/>(Bln)",
+            "ANGSURAN_KE": "Pembayaran", "SISA_ANGSURAN": "Sisa<br/>Tenor<br/>(Bln)",
+            "SISA_CICILAN": "Sisa<br/>Pinjaman<br/>(Rp)", "STATUS": "Status"
         }
-
-        header = [Paragraph(header_text[key], style_header) for key in COLUMN_MAPPING.keys()]
+        
+        header_keys = ["NOPEG", "NAMA", "BAGIAN", "JML", "LAMA", "ANGSURAN_KE", "SISA_ANGSURAN", "SISA_CICILAN", "STATUS"]
+        header = [Paragraph(header_text[key], style_header) for key in header_keys]
         table_data = [header]
 
-        for row in data:
+        for item in data:
+            row = item["SUMMARY"]
             table_data.append([
-                Paragraph(str(row.get("NOPEG", "")), style_body_center),
-                Paragraph(str(row.get("NAMA", "")), style_body_left),
-                Paragraph(str(row.get("BAGIAN", "")), style_body_left),
+                Paragraph(str(item.get("NOPEG", "")), style_body_center),
+                Paragraph(str(item.get("NAMA", "")), style_body_left),
+                Paragraph(str(item.get("BAGIAN", "")), style_body_left),
                 Paragraph(f"{row.get('JML', 0):,.0f}", style_body_center),
                 Paragraph(f"{row.get('LAMA', 0)}", style_body_center),
-                Paragraph(f"{row.get('CICIL', 0):,.0f}", style_body_center),
                 Paragraph(f"{row.get('ANGSURAN_KE', 0)}", style_body_center),
                 Paragraph(f"{row.get('SISA_ANGSURAN', 0)}", style_body_center),
                 Paragraph(f"{row.get('SISA_CICILAN', 0):,.0f}", style_body_center),
                 Paragraph(str(row.get("STATUS", "")), style_body_center)
             ])
         
-        col_widths = [2.1*cm, 4*cm, 2.2*cm, 2*cm, 1.7*cm, 2*cm, 1.4*cm, 1.4*cm, 1.8*cm, 1.7*cm]
-        
+        col_widths = [2*cm, 4*cm, 2.5*cm, 2.5*cm, 1.5*cm, 2*cm, 2*cm, 2.5*cm, 1.5*cm]
         table = Table(table_data, colWidths=col_widths, repeatRows=1)
         
         tbl_style = TableStyle([
@@ -411,6 +408,7 @@ def export_pdf():
         flash("Terjadi kesalahan saat mengekspor data ke PDF", "danger")
         return redirect(url_for("index"))
 
+
 @app.route("/dashboard")
 def dashboard():
     """Halaman ringkasan statistik"""
@@ -424,18 +422,20 @@ def dashboard():
                 status_count={}, bagian_count={}, top_borrowers=[], bagian_pinjaman={}
             )
 
-        status_count = {
-            "Lunas": sum(1 for r in all_data if r["STATUS"] == "Lunas"),
-            "Berjalan": sum(1 for r in all_data if r["STATUS"] == "Berjalan"),
-            "Belum Bayar": sum(1 for r in all_data if r["STATUS"] == "Belum Bayar")
-        }
-
+        # ===== PERUBAHAN LOGIKA PERHITUNGAN STATUS DI SINI vvv =====
+        status_count = {"Lunas": 0, "Berjalan": 0, "Belum Bayar": 0}
+        for r in all_data:
+            # Menggunakan status summary yang sudah dihitung di load_data
+            status = r["SUMMARY"]["STATUS"]
+            if status in status_count:
+                status_count[status] += 1
+        
         bagian_count_raw = {}
         bagian_pinjaman_raw = {}
         for r in all_data:
             bagian = r.get("BAGIAN") or "Tidak Ada"
             bagian_count_raw[bagian] = bagian_count_raw.get(bagian, 0) + 1
-            bagian_pinjaman_raw[bagian] = bagian_pinjaman_raw.get(bagian, 0) + (r.get("JML") or 0)
+            bagian_pinjaman_raw[bagian] = bagian_pinjaman_raw.get(bagian, 0) + (r["SUMMARY"].get("JML") or 0)
 
         sorted_bagian_count = sorted(bagian_count_raw.items(), key=lambda item: item[1], reverse=True)
         top_10_bagian_count = dict(sorted_bagian_count[:10])
@@ -443,13 +443,13 @@ def dashboard():
         sorted_bagian_pinjaman = sorted(bagian_pinjaman_raw.items(), key=lambda item: item[1], reverse=True)
         top_10_bagian_pinjaman = dict(sorted_bagian_pinjaman[:10])
         
-        total_pinjaman = sum(r.get('JML', 0) for r in all_data)
-        sisa_pinjaman = sum(r.get('SISA_CICILAN', 0) for r in all_data)
+        total_pinjaman = sum(r["SUMMARY"].get('JML', 0) for r in all_data)
+        sisa_pinjaman = sum(r["SUMMARY"].get('SISA_CICILAN', 0) for r in all_data)
         total_karyawan = len(all_data)
 
-        sorted_by_pinjaman = sorted(all_data, key=lambda x: x.get("JML", 0), reverse=True)
+        sorted_by_pinjaman = sorted(all_data, key=lambda x: x["SUMMARY"].get("JML", 0), reverse=True)
         top_borrowers = [
-            {"nama": r["NAMA"], "jumlah": r["JML"]}
+            {"nama": r["NAMA"], "jumlah": r["SUMMARY"]["JML"]}
             for r in sorted_by_pinjaman[:10]
         ]
         
