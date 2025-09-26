@@ -386,7 +386,7 @@ def export_pdf():
                 Paragraph(str(row.get("STATUS", "")), style_body_center)
             ])
         
-        col_widths = [2*cm, 4*cm, 2.5*cm, 2.5*cm, 1.5*cm, 2*cm, 2*cm, 2.5*cm, 1.5*cm]
+        col_widths = [2.2*cm, 4*cm, 2.3*cm, 2.3*cm, 1.5*cm, 2.2*cm, 1.8*cm, 2.3*cm, 1.5*cm]
         table = Table(table_data, colWidths=col_widths, repeatRows=1)
         
         tbl_style = TableStyle([
