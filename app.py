@@ -446,8 +446,7 @@ def dashboard():
             "amounts": list(status_amount.values()),
             "percentages": [round((count / total_karyawan) * 100, 1) if total_karyawan > 0 else 0 for count in status_count.values()]
         }
-        
-        # --- Sisa kode tetap sama ---
+ 
         bagian_count_raw = {}
         bagian_pinjaman_raw = {}
         for r in all_data:
