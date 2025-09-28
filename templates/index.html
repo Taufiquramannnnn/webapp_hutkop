@@ -198,7 +198,7 @@
                     <h6 class="fw-bold">Upload Data</h6>
                     <form action="{{ url_for('import_file') }}" method="POST" enctype="multipart/form-data" class="d-flex flex-column align-items-center">
                         <label for="importFile" class="form-label btn btn-outline-primary w-100 mb-2">
-                            <i class="bi bi-upload me-2"></i> Pilih File DBF/Excel
+                            <i class="bi bi-upload me-2"></i> Pilih File DBF (Only DBF)
                         </label>
                         <input type="file" class="form-control d-none" id="importFile" name="file" multiple onchange="this.form.submit()">
                         <small class="text-muted">Bisa pilih banyak file sekaligus</small>
