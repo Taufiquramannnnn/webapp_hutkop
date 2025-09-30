@@ -49,7 +49,7 @@ def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-# Nama Kolom yang Lebih Profesional untuk Tampilan Web dan PDF
+# Nama Kolom untuk Tampilan Web dan PDF
 COLUMN_MAPPING = {
     "NOPEG": "No. Pegawai",
     "NAMA": "Nama Karyawan",
