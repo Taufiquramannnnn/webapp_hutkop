@@ -1,107 +1,134 @@
 /*
  * style.css
- * File CSS kustom untuk styling tambahan
+ * File CSS (Cascading Style Sheets) kustom.
+ *
+ * FUNGSI UTAMA:
+ * - Memberikan "baju" atau tampilan visual pada struktur HTML.
+ * - Mengatur layout, warna, font, dan elemen visual lainnya.
+ * - Membuat tampilan menjadi lebih rapi, modern, dan responsif.
+ *
+ * KORELASI DENGAN FILE LAIN:
+ * - File ini dipanggil di dalam tag <head> pada file `index.html` dan `dashboard.html`.
+ * Contoh: <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+ * - Class selector (contoh: .card, .table) di sini akan diterapkan pada elemen HTML
+ * yang memiliki atribut class yang sama. Misal: <div class="card">...</div>
+ *
+ * CARA MENGUBAH TAMPILAN:
+ * - Untuk mengubah warna, cari kode warna hex (misal: #f0f2f5) dan ganti dengan warna pilihanmu.
+ * - Untuk mengubah ukuran font atau padding, ubah nilai properti seperti `font-size` atau `padding`.
  */
 
-/* Background & Font Dasar */
+/* ==== Pengaturan Dasar Halaman ==== */
 body {
+    /* Warna background utama untuk seluruh halaman. Ganti di sini untuk mengubah warna dasar. */
     background-color: #f0f2f5;
+    /* Font default yang digunakan. Menggunakan font sistem agar ringan dan konsisten di berbagai OS. */
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
 .container {
+    /* Memberi sedikit jarak di atas dan bawah konten utama. */
     margin-top: 1rem;
     margin-bottom: 1rem;
 }
 
-/* Styling Card Global */
+/* ==== Styling Global untuk Semua Card ==== */
 .card {
+    /* Membuat sudut card menjadi lebih tumpul (rounded). */
     border-radius: 0.75rem;
+    /* Menghilangkan border default dari Bootstrap. */
     border: none;
+    /* Menambahkan animasi halus saat cursor mouse diarahkan ke elemen lain. */
     transition: transform 0.2s ease-in-out, box-shadow 0.2s;
 }
 
-/* Styling Tabel Utama */
+/* ==== Styling Tabel Utama di index.html ==== */
 .table-responsive {
     border-radius: 0.5rem;
-    overflow-x: auto;
+    overflow-x: auto; /* Memastikan tabel bisa di-scroll horizontal di layar kecil. */
     border: 1px solid #dee2e6;
 }
 
+/* Header Tabel (<thead>) */
 .table thead th {
-    background-color: #2c3e50; /* Warna biru dongker yang lebih modern */
-    color: #ffffff;
-    vertical-align: middle;
-    text-align: center;
-    font-weight: 600;
-    white-space: nowrap;
-    padding: 0.9rem 0.75rem;
+    /* KONFIGURASI: Warna latar belakang header tabel. Ganti kode hex ini untuk mengubah warna. */
+    background-color: #2c3e50; /* Warna biru dongker yang lebih modern. */
+    color: #ffffff; /* Warna teks header (putih). */
+    vertical-align: middle; /* Posisi teks vertikal di tengah. */
+    text-align: center; /* Posisi teks horizontal di tengah. */
+    font-weight: 600; /* Membuat font sedikit lebih tebal. */
+    white-space: nowrap; /* Mencegah teks header terpotong ke baris baru. */
+    padding: 0.9rem 0.75rem; /* Jarak di dalam sel header. */
 }
 
+/* Isi Tabel (<tbody>) */
 .table tbody td {
     vertical-align: middle;
     padding: 0.75rem;
-    text-align: center; /* Default align center untuk semua cell */
+    text-align: center; /* Default: semua teks di tengah. */
 }
 
-/* Override alignment untuk kolom teks agar rata kiri */
+/* Override alignment khusus untuk kolom teks agar rata kiri, lebih mudah dibaca. */
+/* Menggunakan :nth-child untuk menargetkan kolom ke-2, 3, dan 4. */
 .table tbody tr.expandable-row td:nth-child(2), /* Kolom NOPEG */
 .table tbody tr.expandable-row td:nth-child(3), /* Kolom Nama */
 .table tbody tr.expandable-row td:nth-child(4) { /* Kolom Divisi */
     text-align: left !important;
 }
 
+/* Membuat font nama karyawan sedikit lebih tebal. */
 .table tbody tr.expandable-row td:nth-child(3) {
     font-weight: 500;
 }
 
 
-/* Styling untuk baris yang bisa di-klik */
+/* ==== Styling untuk Master-Detail (Baris yang bisa diklik) ==== */
 .expandable-row {
-    cursor: pointer;
-    transition: background-color 0.2s ease-in-out;
+    cursor: pointer; /* Mengubah cursor menjadi tangan saat diarahkan ke baris. */
+    transition: background-color 0.2s ease-in-out; /* Animasi perubahan warna background. */
 }
 .expandable-row:hover {
-    background-color: #e9f5ff;
+    background-color: #e9f5ff; /* Warna background saat mouse hover. */
 }
 .expandable-row i.bi {
-    transition: transform 0.3s ease;
+    transition: transform 0.3s ease; /* Animasi putaran ikon panah. */
 }
+/* Memutar ikon panah 180 derajat saat baris detail dibuka. */
 .expandable-row[aria-expanded="true"] i.bi {
     transform: rotate(180deg);
 }
+/* Memberi warna background berbeda untuk baris yang sedang aktif/terbuka. */
 .expandable-row[aria-expanded="true"] {
     background-color: #d1e7fd;
 }
 
-
-/* Styling untuk kontainer tabel detail */
+/* Styling untuk kontainer tabel rincian (details). */
 .details-table-container {
     padding: 1.25rem;
-    background-color: #f8f9fa;
-    border-top: 2px solid #0d6efd;
+    background-color: #f8f9fa; /* Warna latar yang sedikit berbeda. */
+    border-top: 2px solid #0d6efd; /* Garis biru di atas sebagai pemisah visual. */
 }
 
 
-/* Pagination */
+/* ==== Styling Pagination (Penomoran Halaman) ==== */
 .pagination .page-item .page-link {
     border-radius: 0.375rem;
     margin: 0 3px;
-    color: #0d6efd;
+    color: #0d6efd; /* Warna teks nomor halaman. */
     border: 1px solid #dee2e6;
     transition: all 0.2s ease-in-out;
 }
 
 .pagination .page-item.active .page-link {
-    background-color: #0d6efd;
+    background-color: #0d6efd; /* Warna background halaman aktif. */
     border-color: #0d6efd;
     color: #fff;
-    box-shadow: 0 4px 8px rgba(13, 110, 253, 0.3);
+    box-shadow: 0 4px 8px rgba(13, 110, 253, 0.3); /* Memberi efek bayangan. */
 }
 
 .pagination .page-item:not(.active) .page-link:hover {
     background-color: #e9ecef;
-    transform: translateY(-2px);
+    transform: translateY(-2px); /* Efek sedikit terangkat saat hover. */
 }
 
 .pagination .page-item.disabled .page-link {
@@ -109,20 +136,20 @@ body {
 }
 
 
-/* Flash Messages (Pesan Notifikasi) */
+/* ==== Styling Flash Messages (Pesan Notifikasi Sukses/Error) ==== */
 .flash-messages {
-    position: fixed;
-    top: 80px;
-    right: 20px;
-    z-index: 1050;
+    position: fixed; /* Tetap di posisi yang sama meskipun halaman di-scroll. */
+    top: 80px; /* Jarak dari atas. */
+    right: 20px; /* Jarak dari kanan. */
+    z-index: 1050; /* Memastikan notifikasi selalu di lapisan paling atas. */
     min-width: 300px;
 }
 
 .flash-messages .alert {
-    box-shadow: 0 0.5rem 1rem rgba(0,0,0,.15);
+    box-shadow: 0 0.5rem 1rem rgba(0,0,0,.15); /* Bayangan agar terlihat 'melayang'. */
 }
 
-/* Custom styling untuk tombol upload file */
+/* Styling kustom untuk tombol upload file agar terlihat seperti tombol biasa. */
 .form-label.btn.btn-outline-primary {
     cursor: pointer;
 }
