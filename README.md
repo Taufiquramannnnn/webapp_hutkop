@@ -1,70 +1,68 @@
-# 📊 Aplikasi Pengelola Data Pinjaman Karyawan
+# 📊 Aplikasi Pengelola Data Pinjaman Karyawan (HutKop)
 
-Aplikasi berbasis **Flask (Python)** untuk mengelola dan memvisualisasikan data pinjaman karyawan dari file DBF atau Excel. Aplikasi ini dirancang untuk melakukan agregasi (penjumlahan) data dari berbagai file untuk karyawan yang memiliki lebih dari satu pinjaman, memberikan gambaran total pinjaman yang akurat.
+Aplikasi web berbasis **Flask (Python)** untuk mengelola, menggabungkan, dan memvisualisasikan data pinjaman karyawan dari berbagai file sumber (`.dbf` atau `.xlsx`). Dirancang khusus untuk melakukan agregasi data secara cerdas, memberikan gambaran total pinjaman yang akurat untuk setiap karyawan.
 
-Dilengkapi dengan fitur filter, pencarian, dan ekspor ke format **PDF, CSV, dan Excel**. Terdapat juga halaman **dashboard interaktif** yang powerful menggunakan Chart.js untuk menampilkan ringkasan data secara visual.
+Dilengkapi dengan fitur filter, pencarian, ekspor laporan profesional (**PDF, CSV, Excel**), dan halaman **dashboard interaktif** untuk analisis data yang mendalam.
 
 ---
 
 ## 🚀 Fitur Utama
 
--    **Import Multi-File**: Unggah beberapa file `.dbf` atau `.xlsx` sekaligus.
--    **Agregasi Data Cerdas**: Secara otomatis menjumlahkan total pinjaman, tenor, cicilan, dan sisa angsuran untuk karyawan yang sama yang datanya tersebar di beberapa file.
--    **Reset Data**: Fitur untuk menghapus semua data yang telah diunggah, memungkinkan perhitungan ulang dari awal dengan mudah.
--    **Filter & Pencarian Lanjutan**: Cari data berdasarkan nama, nomor pegawai, divisi, atau status pinjaman (Lunas, Berjalan, Belum Bayar).
--    **Ekspor Profesional**: Ekspor data gabungan ke format **PDF** (dengan layout rapi), **CSV**, dan **Excel**.
--    **Dashboard Interaktif**: Visualisasikan data dengan ringkasan KPI (total pinjaman, sisa pinjaman, jumlah peminjam) dan grafik interaktif yang menampilkan:
-     -   Distribusi Status Pinjaman
-     -   Top 10 Peminjam Terbesar
-     -   Top 10 Divisi berdasarkan Jumlah Peminjam
-     -   Top 10 Divisi berdasarkan Total Pinjaman
+-   **📤 Import Multi-File**: Unggah beberapa file `.dbf` dan `.xlsx` secara bersamaan.
+-   **🧠 Agregasi Cerdas**: Secara otomatis mengakumulasi total pinjaman, sisa angsuran, dan status untuk karyawan yang sama, meskipun datanya tersebar di banyak file.
+-   **🔍 Filter & Pencarian Lanjutan**: Menyaring data dengan mudah berdasarkan Nama, No. Pegawai, Divisi, atau Status Pinjaman (Lunas, Berjalan, Belum Bayar).
+-   **📄 Ekspor Laporan Profesional**: Unduh data gabungan dalam format **PDF** (dengan layout rapi), **CSV**, atau **Excel** dengan satu klik.
+-   **📊 Dashboard Interaktif**: Dapatkan wawasan cepat melalui visualisasi data menggunakan Chart.js, menampilkan:
+    -   Ringkasan KPI (Total Pinjaman, Sisa Pinjaman, Jumlah Peminjam).
+    -   Distribusi Status Pinjaman.
+    -   Top 10 Peminjam Terbesar.
+    -   Top 10 Divisi berdasarkan Jumlah & Total Pinjaman.
+-   **🗑️ Reset Data**: Hapus semua data yang telah diunggah dengan aman untuk memulai analisis dari awal atau jika ada file terupdate dari file sebelumnya yang ingin diupload (data lama wajib dihapus / direset).
 
 ---
 
-## 🛠️ Teknologi yang Digunakan
+## 🛠️ Tumpukan Teknologi (Tech Stack)
 
 -   **Backend**: [Flask](https://flask.palletsprojects.com/)
 -   **Frontend**: Bootstrap 5 & [Chart.js](https://www.chartjs.org/)
--   **Data Processing**:
-    -   DBF: `dbfread`
-    -   Excel: `pandas` & `openpyxl`
--   **PDF Generation**: `reportlab`
--   **Packaging (Optional)**: `pyinstaller`
+-   **Pemrosesan Data**: `pandas` (untuk Excel) & `dbfread` (untuk DBF)
+-   **Pembuatan PDF**: `reportlab`
+-   **Deployment (Opsional)**: `pyinstaller` untuk packaging menjadi `.exe`
 
 ---
 
-## 📥 Cara Install & Jalankan
+## 📥 Instalasi & Cara Menjalankan
 
-1.  **Clone repository**
-    ```bash
-    git clone [https://github.com/Taufiquramannnnn/webapp_hutkop.git](https://github.com/Taufiquramannnnn/webapp_hutkop.git)
-    cd webapp_hutkop
-    ```
+Ikuti langkah-langkah berikut untuk menjalankan aplikasi di komputer lokal Anda.
 
-2.  **Buat dan aktifkan virtual environment (sangat direkomendasikan)**
-    ```bash
-    # Buat venv
-    python -m venv venv
+**1. Clone Repository**
+```bash
+git clone [https://github.com/Taufiquramannnnn/webapp_hutkop.git](https://github.com/Taufiquramannnnn/webapp_hutkop.git)
+cd webapp_hutkop
+```
 
-    # Aktifkan di Windows
-    venv\Scripts\activate
+**2. Buat & Aktifkan Virtual Environment (Sangat Direkomendasikan)**
+```bash
+# Buat virtual environment
+python -m venv venv
 
-    # Aktifkan di macOS/Linux
-    source venv/bin/activate
-    ```
+# Aktifkan di Windows
+venv\Scripts\activate
 
-3.  **Install semua library yang dibutuhkan**
-    ```bash
-    pip install -r requirements.txt
-    ```
+# Aktifkan di macOS/Linux
+source venv/bin/activate
+```
 
-4.  **Jalankan aplikasi**
-    ```bash
-    python app.py
-    ```
+**3. Install Semua Kebutuhan**
+Pastikan Anda berada di dalam virtual environment yang aktif, lalu jalankan:
+```bash
+pip install -r requirements.txt
+```
 
-5.  **Buka di browser**
-    Aplikasi akan otomatis terbuka di browser default Anda pada alamat:
-    ```
-    [http://127.0.0.1:5000](http://127.0.0.1:5000)
-    ```
+**4. Jalankan Aplikasi**
+```bash
+python app.py / klik start.bat
+```
+Aplikasi akan berjalan dan otomatis membuka tab baru di browser Anda pada alamat `http://127.0.0.1:5000`.
+
+---
