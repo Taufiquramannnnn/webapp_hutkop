@@ -19,4 +19,4 @@ openpyxl==3.1.2           # Diperlukan oleh pandas untuk menangani file .xlsx.
 reportlab==4.2.0          # Untuk membuat dan mengekspor laporan ke format PDF.
 
 # --- (Optional) Packaging ---
-pyinstaller==6.9.0        # Untuk mengubah script Python (.py) menjadi aplikasi executable.
+pyinstaller==6.9.0        # Untuk mengubah script Python <.py> menjadi aplikasi executable.

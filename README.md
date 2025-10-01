@@ -61,7 +61,7 @@ pip install -r requirements.txt
 
 **4. Jalankan Aplikasi**
 ```bash
-python app.py / klik start.bat
+python app.py / klik start.bat.
 ```
 Aplikasi akan berjalan dan otomatis membuka tab baru di browser Anda pada alamat `http://127.0.0.1:5000`.
 
