@@ -113,11 +113,67 @@ def read_dbf_file(path):
 def read_excel_file(path):
     """Membaca satu file Excel dan mengembalikannya sebagai list of dictionary."""
     try:
+        # Biarkan pandas infer tipe data agar kolom ANGx bisa jadi datetime/NaT.
+        # (Tidak dipaksa string supaya tanggal tidak hilang.)
         df = pd.read_excel(path)
+
+        # [FIX] — Normalisasi ringan kolom utama yang numerik supaya aman:
+        # Jika Excel menyimpan sebagai string berformat (misal "Rp 10.000"), kita bersihkan.
+        def _to_float_safe(v):
+            if pd.isna(v): 
+                return 0.0
+            if isinstance(v, str):
+                s = v.replace("Rp", "").replace(".", "").replace(",", "").strip()
+                if s in ("", "-", "NaN", "nan"):
+                    return 0.0
+                try:
+                    return float(s)
+                except Exception:
+                    return 0.0
+            try:
+                return float(v)
+            except Exception:
+                return 0.0
+
+        for c in ("JML", "LAMA", "CICIL"):
+            if c in df.columns:
+                if c == "LAMA":
+                    # tenor sebaiknya integer
+                    df[c] = pd.to_numeric(df[c], errors="coerce").fillna(0).astype(int)
+                else:
+                    df[c] = df[c].map(_to_float_safe)
+
         return df.to_dict(orient="records")
     except Exception as e:
         logger.error(f"Gagal membaca file Excel {path}: {e}")
         return []
+
+# [FIX] — helper untuk deteksi “kosong” yang komprehensif (None, "", b"", 0, NaN, NaT)
+def is_empty_like(v):
+    """
+    Mengembalikan True bila sebuah sel dianggap 'kosong' baik dari DBF maupun Excel.
+    Mencakup: None, string kosong, b"", angka 0, NaN/NaT (pandas).
+    """
+    try:
+        # Tangani NaN/NaT dari pandas/numpy
+        if pd.isna(v):
+            return True
+    except Exception:
+        pass
+
+    # Kosong standar
+    if v in (None, "", b""):
+        return True
+
+    # Angka 0 dianggap belum terisi (umumnya Excel mengisi 0 untuk numeric kosong)
+    try:
+        if isinstance(v, (int, float)) and float(v) == 0:
+            return True
+    except Exception:
+        pass
+
+    return False
+
 
 def normalize_row(row):
     """
@@ -132,13 +188,10 @@ def normalize_row(row):
     # Loop untuk menghitung berapa kali angsuran sudah dibayar.
     # Logikanya: setiap kolom yang namanya diawali 'ANG' dan punya nilai dianggap sebagai pembayaran.
     for k, v in r.items():
-        if str(k).upper().startswith("ANG") and v not in (None, "", b"", 0):
-            try:
-                # Memastikan nilai 0 tidak dihitung sebagai pembayaran.
-                if isinstance(v, (int, float)) and v == 0:
-                    continue
-            except:
-                pass
+        if str(k).upper().startswith("ANG"):
+            # [FIX] — pakai is_empty_like supaya NaN/NaT/0/kosong tidak dihitung sebagai pembayaran.
+            if is_empty_like(v):
+                continue
             angsuran_terbayar += 1
 
     # Membersihkan dan memastikan tipe data untuk kolom utama.
